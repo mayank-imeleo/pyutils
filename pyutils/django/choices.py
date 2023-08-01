@@ -1,3 +1,84 @@
+'''
+Usage
+------------------------------------------------------------------------------
+
+Create a :py:class:`Choices` class and add :py:class:`Choice` objects to the
+class to define your choices.
+
+Example with explicit values:
+==============================================================================
+
+The normal Django version:
+
+.. code-block:: python
+
+    class Human(models.Model):
+        GENDER = (
+            ('m', 'Male'),
+            ('f', 'Female'),
+            ('o', 'Other'),
+        )
+        gender = models.CharField(max_length=1, choices=GENDER)
+
+The Django Utils Choices version:
+
+.. code-block:: python
+
+    from django_utils import choices
+
+    class Human(models.Model):
+        class Gender(choices.Choices):
+            Male = choices.Choice('m')
+            Female = choices.Choice('f')
+            Other = choices.Choice('o')
+
+        gender = models.CharField(max_length=1, choices=Gender)
+
+To reference these properties:
+
+.. code-block:: python
+
+    Human.create(gender=Human.Gender.Male)
+
+Example with implicit values:
+==============================================================================
+
+The normal Django version:
+
+.. code-block:: python
+
+    class SomeModel(models.Model):
+        SOME_ENUM = (
+            (1, 'foo'),
+            (2, 'bar'),
+            (3, 'spam'),
+            (4, 'eggs'),
+        )
+        enum = models.IntegerField(choices=SOME_ENUM, default=1)
+
+The Django Utils Choices version:
+
+.. code-block:: python
+
+    from django_utils import choices
+
+    class SomeModel(models.Model):
+        class Enum(choices.Choices):
+            Foo = choices.Choice()
+            Bar = choices.Choice()
+            Spam = choices.Choice()
+            Eggs = choices.Choice()
+
+        enum = models.IntegerField(
+            choices=Enum, default=Enum.Foo)
+
+To reference these properties:
+
+.. code-block:: python
+
+    SomeModel.create(enum=SomeModel.Enum.Spam)
+
+'''
 import collections
 
 
@@ -200,6 +281,7 @@ class Choices(metaclass=ChoicesMeta):
     def __iter__(self):
         for item in self.choices:
             yield item
+
 
 class LiteralChoices(Choices):
     '''Special version of the Choices class that uses the label as the value
