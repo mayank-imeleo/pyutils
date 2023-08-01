@@ -1,0 +1,229 @@
+import collections
+
+
+class ChoicesDict(object):
+    '''The choices dict is an object that stores a sorted representation of
+    the values by key and database value'''
+
+    def __init__(self):
+        self._by_value = collections.OrderedDict()
+        self._by_key = collections.OrderedDict()
+
+        # Reset the choice creation counter since this will only be accessed
+        # after processing the choices
+        Choice.order = 0
+
+    def __getitem__(self, key):
+        if key in self._by_value:
+            return self._by_value[key]
+        elif key in self._by_key:
+            return self._by_key[key]
+        else:
+            raise KeyError(f'Key {key!r} does not exist')
+
+    def __setitem__(self, key, value):
+        self._by_key[key] = value
+        self._by_value[value.value] = value
+
+    def __iter__(self):
+        for key, value in self._by_value.items():
+            yield key, value
+
+    def items(self):
+        return list(self)
+
+    def values(self):
+        return list(self._by_key.keys())
+
+    def keys(self):
+        return list(self._by_value.keys())
+
+    def __repr__(self):
+        return repr(self._by_key)
+
+    def __str__(self):
+        return str(self._by_key)
+
+
+class Choice(object):
+    '''The choice object has an optional label and value. If the value is not
+    given an autoincrementing id (starting from 1) will be used
+
+    >>> choice = Choice('value', 'label')
+    >>> choice
+    <Choice[1]:label>
+    >>> str(choice)
+    'label'
+
+    >>> choice = Choice()
+    >>> choice
+    <Choice[2]:None>
+    >>> str(choice)
+    'None'
+    '''
+    order = 0
+
+    def __init__(self, value=None, label=None):
+        Choice.order += 1
+        self.value = value
+        self.label = label
+        self.order = Choice.order
+
+    def __eq__(self, other):
+        if isinstance(other, Choice):  # pragma: no branch
+            return self.value == other.value
+        else:
+            return self.value == other
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}[{self.order:d}]:{self.label}>'
+
+    def __str__(self):
+        value = self.__unicode__()
+        return value
+
+    def __unicode__(self):
+        return str(self.label)
+
+    def __hash__(self):
+        return hash(self.value)
+
+    def deconstruct(self):
+        return (
+            '{}.{}'.format(self.__class__.__module__, self.__class__.__name__),
+            (self.value, self.label),
+            {},
+        )
+
+
+class ChoicesMeta(type):
+    '''The choices metaclass is where all the magic happens, this
+    automatically creates a ChoicesDict to get a sorted list of keys and
+    values'''
+
+    def __new__(cls, name, bases, attrs):
+        choices = list()
+        has_values = False
+
+        # Chicken-Egg problem, can't check for something that doesn't exist
+        # yet. That's why we check for the name of the class instead of a
+        # `issubclass`
+        literal = False
+        for base in bases:
+            if base.__name__ == 'LiteralChoices':
+                literal = True
+                break
+
+        for key, value in attrs.items():
+            # Skip private and protected values
+            if key.startswith('_'):
+                continue
+
+            if isinstance(value, (str, int, float)):
+                value = Choice(value, key.lower())
+                setattr(cls, key, value)
+
+            if isinstance(value, Choice):
+                if value.value is not None:
+                    has_values = True
+
+                if not value.label:
+                    value.label = key.lower()
+
+                choices.append((key, value))
+
+        attrs['choices'] = ChoicesDict()
+        i = 0
+        for key, value in sorted(choices, key=lambda c: c[1].order):
+            if has_values:
+                assert value.value is not None, (
+                    'Cannot mix choices with and without values')
+            elif literal:
+                value.value = value.label
+            else:
+                value.value = i
+                i += 1
+
+            attrs[key] = value.value
+            attrs['choices'][key] = value
+
+        return super(ChoicesMeta, cls).__new__(cls, name, bases, attrs)
+
+    def __iter__(self):
+        for item in self.choices:
+            yield item
+
+
+class Choices(metaclass=ChoicesMeta):
+    '''The choices class is what you should inherit in your Django models
+
+    >>> choices = Choices()
+    >>> choices.choices[0]
+    Traceback (most recent call last):
+    ...
+    KeyError: 'Key 0 does not exist'
+    >>> choices.choices
+    OrderedDict()
+    >>> str(choices.choices)
+    'OrderedDict()'
+    >>> choices.choices.items()
+    []
+    >>> choices.choices.keys()
+    []
+    >>> choices.choices.values()
+    []
+    >>> list(choices)
+    []
+
+    >>> class ChoiceTest(Choices):
+    ...     a = Choice()
+    >>> choices = ChoiceTest()
+    >>> choices.choices.items()
+    [(0, <Choice[...]:a>)]
+    >>> choices.a
+    0
+    >>> choices.choices['a']
+    <Choice[...]:a>
+    >>> choices.choices[0]
+    <Choice[...]:a>
+    >>> choices.choices.keys()
+    [0]
+    >>> choices.choices.values()
+    ['a']
+    >>> list(choices)
+    [(0, <Choice[...]:a>)]
+    >>> list(ChoiceTest)
+    [(0, <Choice[...]:a>)]
+    '''
+    choices = ChoicesDict()
+
+    def __iter__(self):
+        for item in self.choices:
+            yield item
+
+class LiteralChoices(Choices):
+    '''Special version of the Choices class that uses the label as the value
+
+    >>> class Role(LiteralChoices):
+    ...     admin = Choice()
+    ...     user = Choice()
+    ...     guest = Choice()
+
+    >>> Role.choices.values()
+    ['admin', 'user', 'guest']
+    >>> Role.choices.keys()
+    ['admin', 'user', 'guest']
+
+
+    >>> class RoleWithImplicitChoice(LiteralChoices):
+    ...     ADMIN = 'admin'
+    ...     USER = 'user'
+    ...     GUEST = 'guest'
+
+    >>> Role.choices.values()
+    ['admin', 'user', 'guest']
+    >>> Role.choices.keys()
+    ['admin', 'user', 'guest']
+    >>> Role.admin
+    'admin'
+    '''

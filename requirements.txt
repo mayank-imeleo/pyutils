@@ -8,6 +8,7 @@ boltons==23.0.0 # https://github.com/mahmoud/boltons
 # Django
 django==4.2.3 # https://github.com/django/django
 djangorestframework==3.14.0 # https://github.com/encode/django-rest-framework
+django-model-utils==4.3.1 # https://github.com/jazzband/django-model-utils
 
 # Web
 pyjwt==2.8.0 # https://github.com/jpadilla/pyjwt
