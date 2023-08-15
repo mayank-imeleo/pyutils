@@ -6,7 +6,8 @@ from django.db import models
 from django.db.models import base
 from django.template import defaultfilters
 
-from pyutils.string import pascal_case_to_dash_case, pascal_case_to_underscore_case
+from pyutils.string import pascal_case_to_dash_case, \
+    pascal_case_to_underscore_case
 
 
 class ModelBaseMeta(base.ModelBase):
@@ -109,8 +110,9 @@ class UUIDBaseModel(ModelBase):
 
 
 class CreatedAtModelBase(ModelBase):
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name='Updated At',auto_now=True)
+    created_at = models.DateTimeField(verbose_name='Updated At',
+                                      auto_now_add=True)
 
     class Meta:
         abstract = True
