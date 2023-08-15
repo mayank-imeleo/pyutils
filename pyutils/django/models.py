@@ -111,7 +111,7 @@ class UUIDBaseModel(ModelBase):
 
 class CreatedAtModelBase(ModelBase):
     updated_at = models.DateTimeField(verbose_name='Updated At',auto_now=True)
-    created_at = models.DateTimeField(verbose_name='Updated At',
+    created_at = models.DateTimeField(verbose_name='Created At',
                                       auto_now_add=True)
 
     class Meta:
