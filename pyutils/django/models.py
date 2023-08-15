@@ -52,7 +52,8 @@ class ModelBase(models.Model, metaclass=ModelBaseMeta):
         flatcase verbose_name
         `TargetSection` => `targetsections`
         """
-        return cls._meta.verbose_name.lower().replace(" ", "")  # pylint: disable[E1101]
+        return cls._meta.verbose_name.lower().replace(" ",
+                                                      "")  # pylint: disable[E1101]
 
     @classmethod
     @property
@@ -70,7 +71,8 @@ class ModelBase(models.Model, metaclass=ModelBaseMeta):
         dash-case verbose_name_plural
         Verbose Name Plurals => verbose-name-plurals
         """
-        return pascal_case_to_dash_case(cls._meta.verbose_name_plural.replace(" ", ""))
+        return pascal_case_to_dash_case(
+            cls._meta.verbose_name_plural.replace(" ", ""))
 
     @classmethod
     @property
@@ -80,7 +82,8 @@ class ModelBase(models.Model, metaclass=ModelBaseMeta):
 
         Verbose Name => verbose_name
         """
-        return pascal_case_to_underscore_case(cls._meta.verbose_name.replace(" ", ""))
+        return pascal_case_to_underscore_case(
+            cls._meta.verbose_name.replace(" ", ""))
 
     @classmethod
     @property
@@ -90,7 +93,8 @@ class ModelBase(models.Model, metaclass=ModelBaseMeta):
 
         Verbose Name Plurals => verbose_name_plurals
         """
-        return pascal_case_to_underscore_case(cls._meta.verbose_name_plural.replace(" ", ""))
+        return pascal_case_to_underscore_case(
+            cls._meta.verbose_name_plural.replace(" ", ""))
 
     class Meta:
         abstract = True
@@ -110,7 +114,7 @@ class UUIDBaseModel(ModelBase):
 
 
 class CreatedAtModelBase(ModelBase):
-    updated_at = models.DateTimeField(verbose_name='Updated At',auto_now=True)
+    updated_at = models.DateTimeField(verbose_name='Updated At', auto_now=True)
     created_at = models.DateTimeField(verbose_name='Created At',
                                       auto_now_add=True)
 
@@ -170,7 +174,7 @@ class SlugMixin(NameMixin):
 
 
 class NameModelBase(NameMixin, ModelBase):
-    name = models.CharField(max_length=100)
+    name = models.CharField(verbose_name='Name', max_length=100)
 
     class Meta:
         abstract = True
