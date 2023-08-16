@@ -92,6 +92,7 @@ class ModelFactoryTestCaseMixin:
     model_class: Type[models.Model]
     model_factory: DjangoModelFactory
     count: int
+    dump_data = False
     DUMP_FIXTURE = "factory_dump.yaml"
     INDENT_SPACES = 2
 
@@ -125,7 +126,8 @@ class ModelFactoryTestCaseMixin:
         n = self.count
         instance = self._create()
         assert n + 1 == self.count
-        self._dumpdata()
+        if self.dump_data:
+            self._dumpdata()
         instance.delete()
         assert n == self.count
 
