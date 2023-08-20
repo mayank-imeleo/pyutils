@@ -46,7 +46,7 @@ class ModelBaseMeta(base.ModelBase):
         return base.ModelBase.__new__(cls, name, bases, attrs)
 
 
-class BaseModel(models.Model, metaclass=ModelBaseMeta):
+class ModelNameMixin:
     @classmethod
     @property
     def model_name_flat_case(cls):
@@ -96,11 +96,13 @@ class BaseModel(models.Model, metaclass=ModelBaseMeta):
             cls._meta.verbose_name_plural.replace(" ", "")
         )
 
+
+class BaseModel(models.Model, ModelNameMixin, metaclass=ModelBaseMeta):
     class Meta:
         abstract = True
 
 
-class UUIDModel(mu_models.UUIDModel, BaseModel):
+class UUIDModel(mu_models.UUIDModel, ModelNameMixin):
     """
     Abstract base model for all models.
 
@@ -111,10 +113,7 @@ class UUIDModel(mu_models.UUIDModel, BaseModel):
         abstract = True
 
 
-class CreatedAtModelBase(mu_models.TimeStampedModel, BaseModel):
-    updated_at = models.DateTimeField(verbose_name="Updated At", auto_now=True)
-    created_at = models.DateTimeField(verbose_name="Created At", auto_now_add=True)
-
+class CreatedAtModelBase(mu_models.TimeStampedModel, ModelNameMixin):
     class Meta:
         abstract = True
 
@@ -173,7 +172,7 @@ class SlugMixin(NameMixin):
         unique_together = ("slug",)
 
 
-class NameModelBase(models.Model, BaseModel):
+class NameModelBase(BaseModel, NameMixin):
     name = models.CharField(verbose_name="Name", max_length=100)
 
     class Meta:
@@ -183,7 +182,7 @@ class NameModelBase(models.Model, BaseModel):
 NameModel = NameModelBase
 
 
-class SlugModelBase(SlugMixin, NameModelBase):
+class SlugModelBase(SlugMixin, NameModel):
     slug = models.SlugField(max_length=50)
 
     class Meta:
