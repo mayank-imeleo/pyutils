@@ -1,4 +1,5 @@
 # from python_utils import formatters
+
 from boltons.strutils import camel2under
 from django.db import models
 from django.db.models import base
@@ -38,13 +39,14 @@ class ModelBaseMeta(base.ModelBase):
         # Override table name only if not explicitly defined
         if not hasattr(Meta, "db_table"):  # pragma: no cover
             module_name = camel2under(name)
-            app_label = module.split(".")[-2]
+            # eg: project_name.app_name.models.model_name
+            app_label = module_name.split(".models")[0].split(".")[-1]
             Meta.db_table = f"{app_label}_{module_name}"
 
         return base.ModelBase.__new__(cls, name, bases, attrs)
 
 
-class ModelNameMixin:
+class BaseModel(models.Model, metaclass=ModelBaseMeta):
     @classmethod
     @property
     def model_name_flat_case(cls):
@@ -94,8 +96,11 @@ class ModelNameMixin:
             cls._meta.verbose_name_plural.replace(" ", "")
         )
 
+    class Meta:
+        abstract = True
 
-class UUIDModel(mu_models.UUIDModel, ModelNameMixin):
+
+class UUIDModel(mu_models.UUIDModel, BaseModel):
     """
     Abstract base model for all models.
 
@@ -106,7 +111,7 @@ class UUIDModel(mu_models.UUIDModel, ModelNameMixin):
         abstract = True
 
 
-class CreatedAtModelBase(mu_models.TimeStampedModel, ModelNameMixin):
+class CreatedAtModelBase(mu_models.TimeStampedModel, BaseModel):
     updated_at = models.DateTimeField(verbose_name="Updated At", auto_now=True)
     created_at = models.DateTimeField(verbose_name="Created At", auto_now_add=True)
 
@@ -168,7 +173,7 @@ class SlugMixin(NameMixin):
         unique_together = ("slug",)
 
 
-class NameModelBase(models.Model, ModelNameMixin):
+class NameModelBase(models.Model, BaseModel):
     name = models.CharField(verbose_name="Name", max_length=100)
 
     class Meta:
