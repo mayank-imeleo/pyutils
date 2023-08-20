@@ -102,7 +102,8 @@ class UUIDModel(mu_models.UUIDModel, ModelNameMixin):
     Adds UUID primary key, created_at, and updated_at fields.
     """
 
-    pass
+    class Meta:
+        abstract = True
 
 
 class CreatedAtModelBase(mu_models.TimeStampedModel, ModelNameMixin):
