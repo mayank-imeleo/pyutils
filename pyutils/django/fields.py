@@ -11,3 +11,13 @@ class PercentField(models.FloatField):
         MinValueValidator(0),
         MaxValueValidator(100),
     ]
+
+
+class MoneyField(models.IntegerField):
+    """
+    Float field that ensures field value is in the range 0-100.
+    """
+
+    default_validators = [
+        MinValueValidator(0),
+    ]

@@ -100,10 +100,10 @@ class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
 
 
 class NameAddressTimeStampedModel(NameModel, TimeStampedModel):
-    add_line_1 = models.CharField("Address Line 1", max_length=200)
-    add_line_2 = models.CharField("Address Line 2", max_length=200)
-    phone_number = models.CharField("Phone Number", max_length=20)
-    email_address = models.EmailField("Email Address", max_length=20)
+    add_line_1 = models.CharField("Address Line 1", max_length=200, default="")
+    add_line_2 = models.CharField("Address Line 2", max_length=200, default="")
+    phone_number = models.CharField("Phone Number", max_length=20, default="")
+    email_address = models.EmailField("Email Address", max_length=20, default="")
 
     city = ChainedForeignKey(
         SubRegion,
@@ -120,7 +120,7 @@ class NameAddressTimeStampedModel(NameModel, TimeStampedModel):
         on_delete=models.CASCADE,
     )
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    pincode = models.CharField(max_length=6)
+    pincode = models.CharField(max_length=6, default="")
 
     class Meta:
         abstract = True
