@@ -1,52 +1,39 @@
 # from python_utils import formatters
 
-from boltons.strutils import camel2under
+from cities_light.models import Country, Region, SubRegion
 from django.db import models
-from django.db.models import base
-from django.template import defaultfilters
 from model_utils import models as mu_models
+from smart_selects.db_fields import ChainedForeignKey
 
 from pyutils.string import pascal_case_to_dash_case, pascal_case_to_underscore_case
 
 
-class ModelBaseMeta(base.ModelBase):
+class NameMixin(object):
+    """Mixin to automatically get a unicode and repr string base on the name
+
+    >>> x = NameMixin()
+    >>> x.pk = 123
+    >>> x.name = 'test'
+    >>> repr(x)
+    '<NameMixin[123]: test>'
+    >>> str(x)
+    'test'
+    >>> str(str(x))
+    'test'
+
     """
-    Model base with more readable naming convention
 
-    Example:
-    Assuming the model is called `app.FooBarObject`
+    def __unicode__(self):
+        return self.name
 
-    Default Django table name: `app_foobarobject`
-    Table name with this base: `app_foo_bar_object`
-    """
+    def __str__(self):
+        return self.__unicode__()
 
-    def __new__(cls, name, bases, attrs):
-        module = attrs["__module__"]
-
-        # Get or create Meta
-        if "Meta" in attrs:
-            Meta = attrs["Meta"]
-        else:
-            Meta = type(
-                "Meta",
-                (object,),
-                dict(
-                    __module__=module,
-                ),
-            )
-            attrs["Meta"] = Meta
-
-        # Override table name only if not explicitly defined
-        if not hasattr(Meta, "db_table"):  # pragma: no cover
-            module_name = camel2under(name)
-            # eg: project_name.app_name.models.model_name
-            app_label = module_name.split(".models")[0].split(".")[-1]
-            Meta.db_table = f"{app_label}_{module_name}"
-
-        return base.ModelBase.__new__(cls, name, bases, attrs)
+    def __repr__(self):
+        return f"<{self.__class__.__name__}[{self.pk or -1:d}]: {self.name}>"
 
 
-class ModelNameMixin:
+class BaseModel(models.Model):
     @classmethod
     @property
     def model_name_flat_case(cls):
@@ -96,113 +83,49 @@ class ModelNameMixin:
             cls._meta.verbose_name_plural.replace(" ", "")
         )
 
-
-class BaseModel(models.Model, ModelNameMixin, metaclass=ModelBaseMeta):
     class Meta:
         abstract = True
 
 
-class UUIDModel(mu_models.UUIDModel, ModelNameMixin):
-    """
-    Abstract base model for all models.
-
-    Adds UUID primary key, created_at, and updated_at fields.
-    """
-
-    class Meta:
-        abstract = True
-
-
-class CreatedAtModelBase(mu_models.TimeStampedModel, ModelNameMixin):
-    class Meta:
-        abstract = True
-
-
-TimeStampedModel = CreatedAtModelBase
-
-
-class NameMixin(object):
-    """Mixin to automatically get a unicode and repr string base on the name
-
-    >>> x = NameMixin()
-    >>> x.pk = 123
-    >>> x.name = 'test'
-    >>> repr(x)
-    '<NameMixin[123]: test>'
-    >>> str(x)
-    'test'
-    >>> str(str(x))
-    'test'
-
-    """
-
-    def __unicode__(self):
-        return self.name
-
-    def __str__(self):
-        return self.__unicode__()
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__}[{self.pk or -1:d}]: {self.name}>"
-
-
-class SlugMixin(NameMixin):
-    """Mixin to automatically slugify the name and add both a name and slug to
-    the model
-
-    >>> x = NameMixin()
-    >>> x.pk = 123
-    >>> x.name = 'test'
-    >>> repr(x)
-    '<NameMixin[123]: test>'
-    >>> str(x)
-    'test'
-    >>> str(str(x))
-    'test'
-
-    """
-
-    def save(self, *args, **kwargs):
-        if not self.slug and self.name:
-            self.slug = defaultfilters.slugify(self.name)
-
-        super(NameMixin, self).save(*args, **kwargs)
-
-    class Meta(object):
-        unique_together = ("slug",)
-
-
-class NameModelBase(BaseModel, NameMixin):
+class NameModel(NameMixin, BaseModel):
     name = models.CharField(verbose_name="Name", max_length=100)
 
     class Meta:
         abstract = True
 
 
-NameModel = NameModelBase
+class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
+    class Meta:
+        abstract = True
 
 
-class SlugModelBase(SlugMixin, NameModel):
-    slug = models.SlugField(max_length=50)
+class NameAddressTimeStampedModel(NameModel, TimeStampedModel):
+    add_line_1 = models.CharField("Address Line 1", max_length=200)
+    add_line_2 = models.CharField("Address Line 2", max_length=200)
+    phone_number = models.CharField("Phone Number", max_length=20)
+    email_address = models.EmailField("Email Address", max_length=20)
+
+    city = ChainedForeignKey(
+        SubRegion,
+        chained_field="state",
+        chained_model_field="region",
+        auto_choose=True,
+        on_delete=models.CASCADE,
+    )
+    state = ChainedForeignKey(
+        Region,
+        chained_field="country",
+        chained_model_field="country",
+        auto_choose=True,
+        on_delete=models.CASCADE,
+    )
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    pincode = models.CharField(max_length=6)
 
     class Meta:
         abstract = True
 
 
-SlugModel = SlugModelBase
-
-
-class NameCreatedAtModelBase(NameModel, mu_models.TimeStampedModel):
+class NameTimeStampedModel(NameModel, TimeStampedModel):
     class Meta:
         abstract = True
-
-
-NameTimeStampedModel = NameCreatedAtModelBase
-
-
-class SlugCreatedAtModelBase(SlugModel, mu_models.TimeStampedModel):
-    class Meta:
-        abstract = True
-
-
-SlugTimeStampedModel = SlugCreatedAtModelBase
