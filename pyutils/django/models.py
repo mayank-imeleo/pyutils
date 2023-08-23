@@ -88,7 +88,7 @@ class BaseModel(models.Model):
 
 
 class NameModel(NameMixin, BaseModel):
-    name = models.CharField(verbose_name="Name", max_length=100)
+    name = models.CharField(verbose_name="Name", max_length=100, unique=True)
 
     class Meta:
         abstract = True
