@@ -7,6 +7,10 @@ from smart_selects.db_fields import ChainedForeignKey
 
 from pyutils.string import pascal_case_to_dash_case, pascal_case_to_underscore_case
 
+SubRegion.__str__ = lambda x: x.name
+Region.__str__ = lambda x: x.name
+Country.__str__ = lambda x: x.name
+
 
 class NameMixin(object):
     """Mixin to automatically get a unicode and repr string base on the name
