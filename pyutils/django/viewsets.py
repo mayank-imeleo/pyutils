@@ -4,7 +4,7 @@ from rest_framework import mixins
 from rest_framework.routers import SimpleRouter
 from rest_framework.viewsets import GenericViewSet
 
-from pyutils.django.models import ModelBase
+from pyutils.django.models import BaseModel
 from pyutils.string import pascal_case_to_dash_case
 
 
@@ -19,7 +19,7 @@ class GenericModelViewSet(GenericViewSet):
     """
 
     @classmethod
-    def model(cls) -> ModelBase:
+    def model(cls) -> BaseModel:
         """
         Directly access the `Model` class
         """
