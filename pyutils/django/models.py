@@ -104,27 +104,38 @@ class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
 
 
 class NameAddressTimeStampedModel(NameModel, TimeStampedModel):
-    add_line_1 = models.CharField("Address Line 1", max_length=200, default="")
-    add_line_2 = models.CharField("Address Line 2", max_length=200, default="")
-    phone_number = models.CharField("Phone Number", max_length=20, default="")
-    email_address = models.EmailField("Email Address", max_length=20, default="")
+    add_line_1 = models.CharField(
+        "Address Line 1", max_length=200, default="", blank=True, null=True
+    )
+    add_line_2 = models.CharField(
+        "Address Line 2", max_length=200, default="", blank=True, null=True
+    )
+    phone_num = models.CharField(
+        "Phone Number", max_length=20, default="", blank=True, null=True
+    )
+
+    email_address = models.EmailField(
+        "Email Address", max_length=20, default="", blank=True, null=True
+    )
 
     city = ChainedForeignKey(
         SubRegion,
         chained_field="state",
         chained_model_field="region",
         auto_choose=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
     )
     state = ChainedForeignKey(
         Region,
         chained_field="country",
         chained_model_field="country",
         auto_choose=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
     )
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    pincode = models.CharField(max_length=6, default="")
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    pincode = models.CharField(max_length=6, default="", blank=True, null=True)
 
     class Meta:
         abstract = True
