@@ -1,7 +1,9 @@
 # from python_utils import formatters
 
 from cities_light.models import Country, Region, SubRegion
+from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from model_utils import models as mu_models
 from smart_selects.db_fields import ChainedForeignKey
 
@@ -67,7 +69,7 @@ class BaseModel(models.Model):
 
     @classmethod
     @property
-    def model_name_upper_case(cls):
+    def model_name_underscore_case(cls):
         """
         underscore_case verbose_name
 
@@ -77,7 +79,7 @@ class BaseModel(models.Model):
 
     @classmethod
     @property
-    def model_name_plural_upper_case(cls):
+    def model_name_plural_underscore_case(cls):
         """
         underscore_case verbose_name_plural
 
