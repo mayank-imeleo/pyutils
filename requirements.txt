@@ -13,7 +13,7 @@ factory-boy==3.3.0  # https://github.com/FactoryBoy/factory_boy
 django-cities-light==3.9.2 # https://github.com/yourlabs/django-cities-light
 django-smart-selects==1.6.0 # https://github.com/jazzband/django-smart-selects
 django-filter==23.2 # https://github.com/carltongibson/django-filter
-wagtail==5.1.1
+wagtail==5.1
 
 # Web
 pyjwt==2.8.0 # https://github.com/jpadilla/pyjwt
