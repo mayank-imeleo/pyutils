@@ -12,3 +12,16 @@ class BaseDjangoAdmin(admin.ModelAdmin):
     )
     search_fields = ["name"]
     ordering = ("id",)
+
+
+class TimeStampedModelAdmin(admin.ModelAdmin):
+    """
+    Base Django Admin
+    """
+
+    list_display = (
+        "created",
+        "modified",
+    )
+    search_fields = ()
+    ordering = ("-modified",)

@@ -1,6 +1,8 @@
 from typing import Type
 
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
+from rest_framework.filters import SearchFilter
 from rest_framework.routers import SimpleRouter
 from rest_framework.viewsets import GenericViewSet
 
@@ -17,6 +19,8 @@ class GenericModelViewSet(GenericViewSet):
 
     See the respective methods for more documentation:
     """
+
+    filter_backends = [DjangoFilterBackend, SearchFilter]
 
     @classmethod
     def model(cls) -> BaseModel:
@@ -54,6 +58,9 @@ class GenericModelViewSet(GenericViewSet):
         s = getattr(cls.model(), "_meta").verbose_name_plural
         s = s.replace(" ", "")
         return pascal_case_to_dash_case(s)
+
+
+BaseModelViewSet = GenericModelViewSet
 
 
 class GenericReadOnlyModelViewSet(

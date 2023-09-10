@@ -1,9 +1,7 @@
 # from python_utils import formatters
 
 from cities_light.models import Country, Region, SubRegion
-from django.contrib.auth import get_user_model
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from model_utils import models as mu_models
 from smart_selects.db_fields import ChainedForeignKey
 
@@ -12,6 +10,13 @@ from pyutils.string import pascal_case_to_dash_case, pascal_case_to_underscore_c
 SubRegion.__str__ = lambda x: x.name
 Region.__str__ = lambda x: x.name
 Country.__str__ = lambda x: x.name
+
+
+class IdMixin(object):
+    def __repr__(self):
+        return "{}(id={})".format(self.__class__.__name__, getattr(self, "id"))
+
+    __str__ = __repr__
 
 
 class NameMixin(object):
@@ -39,7 +44,17 @@ class NameMixin(object):
         return f"<{self.__class__.__name__}[{self.pk or -1:d}]: {self.name}>"
 
 
-class BaseModel(models.Model):
+class BaseModel(models.Model, IdMixin):
+    @classmethod
+    @property
+    def model_name_verbose(cls):
+        return cls._meta.verbose_name
+
+    @classmethod
+    @property
+    def model_name_verbose_plural(cls):
+        return cls._meta.verbose_name_plural
+
     @classmethod
     @property
     def model_name_flat_case(cls):
