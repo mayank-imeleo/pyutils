@@ -1,6 +1,7 @@
 # from python_utils import formatters
 
 from cities_light.models import Country, Region, SubRegion
+from django.conf import settings
 from django.db import models
 from model_utils import models as mu_models
 from smart_selects.db_fields import ChainedForeignKey
@@ -115,7 +116,48 @@ class NameModel(NameMixin, BaseModel):
         abstract = True
 
 
+class UserStampedModel(models.Model):
+    """
+    An abstract base class model that provides self-updating
+    ``created_by`` and ``modified_by`` fields.
+
+    """
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="%(app_label)s_%(class)s_createdby_relationship",
+        blank=True,
+        null=True,
+        default=None,
+    )
+    modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="%(app_label)s_%(class)s_modifiedby_relationship",
+        blank=True,
+        null=True,
+        default=None,
+    )
+
+    def _save_user_stamps(self, *args, **kwargs):
+        # self.modified_by = self.get_
+        update_fields = kwargs.get("update_fields", None)
+        if update_fields:
+            kwargs["update_fields"] = set(update_fields).union({"modified"})
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        abstract = True
+
+
 class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
+    def _save_time_stamps(self, *args, **kwargs):
+        update_fields = kwargs.get("update_fields", None)
+        if update_fields:
+            kwargs["update_fields"] = set(update_fields).union({"modified"})
+
     class Meta:
         abstract = True
 
@@ -159,5 +201,14 @@ class NameAddressTimeStampedModel(NameModel, TimeStampedModel):
 
 
 class NameTimeStampedModel(NameModel, TimeStampedModel):
+    class Meta:
+        abstract = True
+
+
+class UserTimeStampedModel(UserStampedModel, TimeStampedModel):
+    def save(self, *args, **kwargs):
+        self._save_user_stamps(*args, **kwargs)
+        self._save_time_stamps(*args, **kwargs)
+
     class Meta:
         abstract = True
