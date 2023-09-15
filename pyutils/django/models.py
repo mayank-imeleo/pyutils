@@ -6,6 +6,7 @@ from django.db import models
 from model_utils import models as mu_models
 from smart_selects.db_fields import ChainedForeignKey
 
+from pyutils.django.managers import TimeStampedModelManager
 from pyutils.string import pascal_case_to_dash_case, pascal_case_to_underscore_case
 
 SubRegion.__str__ = lambda x: x.name
@@ -153,6 +154,8 @@ class UserStampedModel(models.Model):
 
 
 class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
+    objects = TimeStampedModelManager
+
     def _save_time_stamps(self, *args, **kwargs):
         update_fields = kwargs.get("update_fields", None)
         if update_fields:
