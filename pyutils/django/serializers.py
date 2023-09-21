@@ -1,6 +1,19 @@
+import pytz
+from django.conf import settings
+from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+from rest_framework.settings import api_settings
 
 from pyutils.django.models import BaseModel
+
+
+class LocalTimeStampField(serializers.DateTimeField):
+    def __init__(self):
+        super(LocalTimeStampField, self).__init__(
+            read_only=True,
+            format=api_settings.DATETIME_FORMAT,
+            default_timezone=pytz.timezone(settings.LOCAL_TIME_ZONE),
+        )
 
 
 class GenericSerializer(ModelSerializer):
@@ -82,3 +95,8 @@ class NameIdModelSerializer(NameModelSerializer, IdModelSerializer):
                     self.model.model_name_verbose, data_or_instance
                 )
             )
+
+
+class LocalTimeStampModelSerializer(BaseModelSerializer):
+    created = LocalTimeStampField()
+    modified = LocalTimeStampField()
