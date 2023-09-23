@@ -177,7 +177,7 @@ class NameAddressTimeStampedModel(NameModel, TimeStampedModel):
     )
 
     email_address = models.EmailField(
-        "Email Address", max_length=20, default="", blank=True, null=True
+        "Email Address", max_length=100, default="", blank=True, null=True
     )
 
     city = ChainedForeignKey(
