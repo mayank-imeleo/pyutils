@@ -3,11 +3,13 @@
 from cities_light.models import Country, Region, SubRegion
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from model_utils import models as mu_models
 from smart_selects.db_fields import ChainedForeignKey
 
 from pyutils.django.managers import TimeStampedModelManager
-from pyutils.string import pascal_case_to_dash_case, pascal_case_to_underscore_case
+from pyutils.string import pascal_case_to_dash_case, \
+    pascal_case_to_underscore_case
 
 SubRegion.__str__ = lambda x: x.name
 Region.__str__ = lambda x: x.name
@@ -109,6 +111,12 @@ class BaseModel(models.Model, IdMixin):
     class Meta:
         abstract = True
 
+
+class ActiveModel(BaseModel):
+    is_active = models.BooleanField(verbose_name=_("Is Active"), default=True)
+
+    class Meta:
+        abstract = True
 
 class NameModel(NameMixin, BaseModel):
     name = models.CharField(verbose_name="Name", max_length=100, unique=True)
