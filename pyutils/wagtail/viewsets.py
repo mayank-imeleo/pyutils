@@ -24,6 +24,7 @@ class PageCRUDViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+        self.after_perform_create(request, *args, **kwargs)
         headers = self.get_success_headers(self.response_data(serializer))
         return Response(
             self.response_data(serializer),
@@ -38,6 +39,12 @@ class PageCRUDViewSet(
 
     def perform_create(self, serializer):
         return self.add_child(**serializer.validated_data)
+
+    def after_perform_create(self, request, *args, **kwargs):
+        """
+        Hook to update the created instance
+        """
+        pass
 
     def add_child(self, **kwargs):
         if not (

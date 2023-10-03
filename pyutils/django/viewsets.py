@@ -69,6 +69,17 @@ class GenericReadOnlyModelViewSet(
     pass
 
 
+class GenericRetrieveModelViewSet(mixins.RetrieveModelMixin, GenericModelViewSet):
+    @classmethod
+    def url_prefix(cls) -> str:
+        """
+        "Some Model" => some-model-details
+        :return:
+        """
+        s = getattr(cls.model(), "_meta").verbose_name.replace(" ", "")
+        return pascal_case_to_dash_case(s) + "-details"
+
+
 class GenericCRUDModelViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
