@@ -15,7 +15,7 @@ django-cities-light==3.9.2 # https://github.com/yourlabs/django-cities-light
 django-smart-selects==1.6.0 # https://github.com/jazzband/django-smart-selects
 django-filter==23.2 # https://github.com/carltongibson/django-filter
 wagtail==5.1
-
+django-import-export==3.2.0 # https://github.com/django-import-export/django-import-export
 # Web
 pyjwt==2.8.0 # https://github.com/jpadilla/pyjwt
 
