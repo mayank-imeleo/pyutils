@@ -21,16 +21,20 @@ class PageCRUDViewSet(
     child_page_instance: Union[Page, PageAutoFieldsMixin]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=self.data_for_create(request))
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         self.after_perform_create(request, *args, **kwargs)
+        self.child_page_instance.save_revision().publish()
         headers = self.get_success_headers(self.response_data(serializer))
         return Response(
             self.response_data(serializer),
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
+
+    def data_for_create(self, request):
+        return request.data
 
     def response_data(self, serializer):
         data = serializer.data
@@ -64,3 +68,9 @@ class PageCRUDViewSet(
             self.child_page_instance = index_page.add_child(instance=child_page)
         except NodeAlreadySaved:
             self.child_page_instance = child_page
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
