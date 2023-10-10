@@ -11,3 +11,7 @@ class TimeStampedModelManager(Manager):
         today_start = datetime.combine(today, time(), tzutc())
         today_end = datetime.combine(tomorrow, time(), tzutc())
         return self.filter(created__lte=today_end, created__gte=today_start)
+
+    def records_current_month(self):
+        today = datetime.now()
+        return self.filter(created__year=today.year, created__month=today.month)
