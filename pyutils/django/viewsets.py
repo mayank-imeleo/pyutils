@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Type
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -58,6 +59,26 @@ class GenericModelViewSet(GenericViewSet):
         s = getattr(cls.model(), "_meta").verbose_name_plural
         s = s.replace(" ", "")
         return pascal_case_to_dash_case(s)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
+
+
+class TimeStampedListModelMixin(mixins.ListModelMixin):
+    def list(self, request, *args, **kwargs):
+        def parse_date_field(field):
+            if field in request.query_params:
+                request.query_params[field] = datetime.strptime(
+                    request.query_params[field], "%d-%b-%Y"
+                )
+
+        parse_date_field("created__date")
+        parse_date_field("created__lte")
+        parse_date_field("created__gte")
+        return super().list(request, *args, **kwargs)
 
 
 BaseModelViewSet = GenericModelViewSet

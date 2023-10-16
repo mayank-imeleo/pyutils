@@ -5,11 +5,11 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from model_utils import models as mu_models
+from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from smart_selects.db_fields import ChainedForeignKey
 
 from pyutils.django.managers import TimeStampedModelManager
-from pyutils.string import pascal_case_to_dash_case, \
-    pascal_case_to_underscore_case
+from pyutils.string import pascal_case_to_dash_case, pascal_case_to_underscore_case
 
 SubRegion.__str__ = lambda x: x.name
 Region.__str__ = lambda x: x.name
@@ -118,6 +118,7 @@ class ActiveModel(BaseModel):
     class Meta:
         abstract = True
 
+
 class NameModel(NameMixin, BaseModel):
     name = models.CharField(verbose_name="Name", max_length=100, unique=True)
 
@@ -163,6 +164,8 @@ class UserStampedModel(models.Model):
 
 class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
     objects = TimeStampedModelManager
+    created = AutoCreatedField(_("created"), db_index=True)
+    modified = AutoLastModifiedField(_("modified"), db_index=True)
 
     def _save_time_stamps(self, *args, **kwargs):
         update_fields = kwargs.get("update_fields", None)
