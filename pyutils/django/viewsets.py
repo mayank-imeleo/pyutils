@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import timedelta
 from typing import Type
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -7,6 +7,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.routers import SimpleRouter
 from rest_framework.viewsets import GenericViewSet
 
+from pyutils.datetime import ddmonyyyy_to_datetime
 from pyutils.django.models import BaseModel
 from pyutils.string import pascal_case_to_dash_case
 
@@ -69,16 +70,21 @@ class GenericModelViewSet(GenericViewSet):
 
 class TimeStampedListModelMixin(mixins.ListModelMixin):
     def list(self, request, *args, **kwargs):
-        def parse_date_field(field):
-            if field in request.query_params:
-                request.query_params[field] = datetime.strptime(
-                    request.query_params[field], "%d-%b-%Y"
-                )
-
-        parse_date_field("created__date")
-        parse_date_field("created__lte")
-        parse_date_field("created__gte")
+        self._parse_date_fields(request, *args, **kwargs)
         return super().list(request, *args, **kwargs)
+
+    def _parse_date_fields(self, request, *args, **kwargs):
+        def parse(field):
+            # convert str to datetime
+            if field in request.query_params:
+                dt = ddmonyyyy_to_datetime(request.query_params[field])
+                if field.endswith("__lte"):
+                    dt = dt + timedelta(days=1)
+                request.query_params[field] = dt
+
+        parse("created__date")
+        parse("created__lte")
+        parse("created__gte")
 
 
 BaseModelViewSet = GenericModelViewSet
