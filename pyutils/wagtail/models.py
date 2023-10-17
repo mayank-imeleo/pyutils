@@ -1,9 +1,14 @@
 import uuid
 from typing import List
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.template.defaultfilters import slugify
 from treebeard.exceptions import NodeAlreadySaved
+from wagtail.images.models import Image
 from wagtail.models import Page
+from wagtail.utils.file import hash_filelike
+
+from pyutils.images import get_image_dimensions
 
 
 class PageAutoFieldsMixin:
@@ -81,3 +86,21 @@ class BasePage(Page):
 
 def child_has_parent(child):
     return child.depth and child.path
+
+
+def save_uploaded_image(uploaded_file: InMemoryUploadedFile, filename=None):
+    fn = filename or uploaded_file.name
+    fp = f"media/original_images/{fn}"
+    with open(fp, "wb") as f:
+        for chunk in uploaded_file.chunks():
+            f.write(chunk)
+    w, h = get_image_dimensions(fp)
+    _hash = hash_filelike(open(fp, "rb"))
+    image, _ = Image.objects.get_or_create(
+        title=fn,
+        file=f"original_images/{fn}",
+        width=w,
+        height=h,
+        file_hash=_hash,
+    )
+    return image
