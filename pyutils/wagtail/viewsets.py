@@ -21,17 +21,23 @@ class PageCRUDViewSet(
     child_page_instance: Union[Page, PageAutoFieldsMixin]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=self.data_for_create(request))
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        self.after_perform_create(request, *args, **kwargs)
-        self.child_page_instance.save_revision().publish()
-        headers = self.get_success_headers(self.response_data(serializer))
-        return Response(
-            self.response_data(serializer),
-            status=status.HTTP_201_CREATED,
-            headers=headers,
-        )
+        try:
+            serializer = self.get_serializer(data=self.data_for_create(request))
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            self.after_perform_create(request, *args, **kwargs)
+            self.child_page_instance.save_revision().publish()
+            headers = self.get_success_headers(self.response_data(serializer))
+            return Response(
+                self.response_data(serializer),
+                status=status.HTTP_201_CREATED,
+                headers=headers,
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     def data_for_create(self, request):
         return request.data
