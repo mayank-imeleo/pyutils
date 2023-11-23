@@ -175,11 +175,13 @@ class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
     def get_local_created(self):
         return self._dt_to_str_local_tz(self.created)
 
+    get_local_created.admin_order_field = "created"
     get_local_created.short_description = "Created"
 
     def get_local_modified(self):
         return self._dt_to_str_local_tz(self.modified)
 
+    get_local_modified.admin_order_field = "modified"
     get_local_modified.short_description = "Modified"
 
     @staticmethod
