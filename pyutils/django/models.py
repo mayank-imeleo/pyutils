@@ -1,5 +1,5 @@
 # from python_utils import formatters
-
+import pytz
 from cities_light.models import Country, Region, SubRegion
 from django.conf import settings
 from django.db import models
@@ -171,6 +171,22 @@ class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
         update_fields = kwargs.get("update_fields", None)
         if update_fields:
             kwargs["update_fields"] = set(update_fields).union({"modified"})
+
+    def get_local_created(self):
+        return self._dt_to_str_local_tz(self.created)
+
+    get_local_created.short_description = "Created"
+
+    def get_local_modified(self):
+        return self._dt_to_str_local_tz(self.modified)
+
+    get_local_modified.short_description = "Modified"
+
+    @staticmethod
+    def _dt_to_str_local_tz(dt):
+        return dt.astimezone(pytz.timezone(settings.LOCAL_TIME_ZONE)).strftime(
+            "%d %b %Y %I:%M %p"
+        )
 
     class Meta:
         abstract = True
