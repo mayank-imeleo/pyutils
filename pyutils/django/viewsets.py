@@ -29,7 +29,15 @@ class GenericModelViewSet(GenericViewSet):
         """
         Directly access the `Model` class
         """
-        return cls.serializer_class.Meta.model
+        serializer_class = (
+            cls.serializer_class or list(cls.action_serializer_classes.values())[0]
+        )
+        if not serializer_class:
+            raise Exception(
+                "You need to specify either"
+                " serializer_class or action_serializer_classes"
+            )
+        return serializer_class.Meta.model
 
     @classmethod
     def url_prefix(cls) -> str:
@@ -124,3 +132,28 @@ def router_register_viewset(router: SimpleRouter, viewset: Type[GenericModelView
     """
     router.register(viewset.url_prefix(), viewset)
     return router
+
+
+class ViewSetActionSerializerMixin:
+    """
+    Mixin to use action serializers for a viewset.
+    """
+
+    action_serializer_classes = {}
+
+    def get_serializer_class(self):
+        """
+        Look for serializer class in self.serializer_classes, which
+        should be a dict mapping action name (key) to serializer class (value),
+        i.e.:
+
+        class MyViewSet(ViewSetMultipleSerializerMixin, ViewSet):
+            serializer_classes = {
+                'list': MyListSerializer,
+                'my_action': MyActionSerializer,
+            }
+        """
+        try:
+            return self.action_serializer_classes[self.action]
+        except (KeyError, AttributeError):
+            return super().get_serializer_class()
