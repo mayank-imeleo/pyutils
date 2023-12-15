@@ -52,6 +52,10 @@ class IdModelSerializer(BaseModelSerializer):
 
 
 class NameModelSerializer(BaseModelSerializer):
+    """
+    Serializer model instance with name
+    """
+
     def to_internal_value(self, data):
         if isinstance(data, str) and len(data) > 0:
             return self._get_object_by_name(data)
@@ -69,6 +73,10 @@ class NameModelSerializer(BaseModelSerializer):
 
 
 class NameIdModelSerializer(NameModelSerializer, IdModelSerializer):
+    """
+    Serializer model instance with name or id
+    """
+
     def to_internal_value(self, data):
         instance = None
         try:
