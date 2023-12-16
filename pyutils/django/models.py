@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from model_utils import models as mu_models
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
+from rest_framework.exceptions import ValidationError
 from smart_selects.db_fields import ChainedForeignKey
 
 from pyutils.django.managers import TimeStampedModelManager
@@ -107,6 +108,13 @@ class BaseModel(models.Model, IdMixin):
         return pascal_case_to_underscore_case(
             cls._meta.verbose_name_plural.replace(" ", "")
         )
+
+    @classmethod
+    def validate_model_id(cls, model_id):
+        try:
+            cls.objects.get(id=model_id)
+        except cls.DoesNotExist:
+            raise ValidationError(f"Invalid {cls.model_name_verbose} ID - {model_id}")
 
     class Meta:
         abstract = True
