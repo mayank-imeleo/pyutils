@@ -139,7 +139,26 @@ class ViewSetActionSerializerMixin:
     Mixin to use action serializers for a viewset.
     """
 
-    action_serializer_classes = {}
+    action_serializer_classes = {
+        "list": None,
+        "create": None,
+        "destroy": None,
+        "retrieve": None,
+        "update": None,
+    }
+
+    def create(self, request, *args, **kwargs):
+        """
+        Use retrieve serializer for serializing the created instance.
+        """
+        response = super().create(request, *args, **kwargs)
+        assert "id" in response.data, "id not found in response"
+        retreive_serializer_class = self.action_serializer_classes["retrieve"]
+        model_class = self.model()
+        instance = model_class.objects.get(id=response.data["id"])
+        retreive_data = retreive_serializer_class(instance).data
+        response.data = retreive_data
+        return response
 
     def get_serializer_class(self):
         """
