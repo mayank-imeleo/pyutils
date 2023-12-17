@@ -4,7 +4,7 @@ from wagtail.admin.forms import WagtailAdminModelForm
 class UserTimestampWagtailAdminForm(WagtailAdminModelForm):
     def full_clean(self):
         super().full_clean()
-        # self.instance.created_by = self.for_user
+        self.instance.created_by = self.for_user
         self.instance.modified_by = self.for_user
 
 
