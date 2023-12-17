@@ -143,19 +143,13 @@ class UserStampedModel(models.Model):
 
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="%(app_label)s_%(class)s_createdby_relationship",
-        blank=True,
-        null=True,
-        default=None,
     )
     modified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="%(app_label)s_%(class)s_modifiedby_relationship",
-        blank=True,
-        null=True,
-        default=None,
     )
 
     def _save_user_stamps(self, *args, **kwargs):
