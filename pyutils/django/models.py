@@ -246,3 +246,6 @@ class UserTimeStampedModel(UserStampedModel, TimeStampedModel):
 
     class Meta:
         abstract = True
+
+
+UserStampModel = UserTimeStampedModel

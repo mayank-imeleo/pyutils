@@ -3,10 +3,18 @@ from typing import Union
 from rest_framework import mixins, status
 from rest_framework.response import Response
 from treebeard.exceptions import NodeAlreadySaved
+from wagtail.admin.panels import ObjectList
 from wagtail.models import Page
+from wagtail.snippets.views.snippets import SnippetViewSet
 
 from pyutils.django.viewsets import GenericModelViewSet
+from pyutils.wagtail.forms import TimestampFormViewMixin
 from pyutils.wagtail.models import PageAutoFieldsMixin
+from pyutils.wagtail.views import (
+    UserTimestampCreateView,
+    UserTimestampEditView,
+    ModelInspectView,
+)
 
 
 class PageCRUDViewSet(
@@ -74,3 +82,35 @@ class PageCRUDViewSet(
             self.child_page_instance = index_page.add_child(instance=child_page)
         except NodeAlreadySaved:
             self.child_page_instance = child_page
+
+
+class BaseSnippetViewSet(SnippetViewSet):
+    pass
+
+
+class UserTimestampSnippetViewSet(TimestampFormViewMixin, BaseSnippetViewSet):
+    add_view_class = UserTimestampCreateView
+    edit_view_class = UserTimestampEditView
+
+    list_display = []
+
+    ordering = ("-id",)
+    inspect_view_enabled = True
+    inspect_view_class = ModelInspectView
+    content_panels = []
+    edit_handler = ObjectList(content_panels)
+
+    @property
+    def inspect_view_fields(self):
+        timestamp_fields = [
+            "created_by",
+            "modified_by",
+            "get_local_created",
+            "get_local_modified",
+        ]
+        inspect_view_fields = [
+            f for f in self.list_display if f not in timestamp_fields
+        ]
+        inspect_view_fields += timestamp_fields
+
+        return inspect_view_fields

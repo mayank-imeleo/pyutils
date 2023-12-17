@@ -1,7 +1,7 @@
 from wagtail.images.components import ImageDisplay
-from wagtail.snippets.views.snippets import InspectView
+from wagtail.snippets.views.snippets import InspectView, CreateView, EditView
 
-from pyutils.django.models import BaseModel
+from pyutils.wagtail.forms import TimestampFormViewMixin
 
 
 class ModelInspectView(InspectView):
@@ -18,3 +18,11 @@ class ModelInspectView(InspectView):
                 continue
             fields_context.append(field_context)
         return fields_context
+
+
+class UserTimestampCreateView(TimestampFormViewMixin, CreateView):
+    pass
+
+
+class UserTimestampEditView(TimestampFormViewMixin, EditView):
+    pass
