@@ -166,8 +166,12 @@ class UserStampedModel(models.Model):
 
 class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
     objects = TimeStampedModelManager()
-    created = AutoCreatedField(_("created"), db_index=True)
-    modified = AutoLastModifiedField(_("modified"), db_index=True)
+    created = AutoCreatedField(_("created"), db_index=True, db_column="created_at")
+    modified = AutoLastModifiedField(
+        _("modified"), db_index=True, db_column="modified_at"
+    )
+    created_at = created
+    modified_at = modified
 
     def _save_time_stamps(self, *args, **kwargs):
         update_fields = kwargs.get("update_fields", None)
