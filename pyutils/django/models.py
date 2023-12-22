@@ -165,7 +165,7 @@ class UserStampedModel(models.Model):
 
 
 class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
-    objects = TimeStampedModelManager
+    objects = TimeStampedModelManager()
     created = AutoCreatedField(_("created"), db_index=True)
     modified = AutoLastModifiedField(_("modified"), db_index=True)
 
