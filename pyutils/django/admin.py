@@ -25,3 +25,15 @@ class TimeStampedModelAdmin(admin.ModelAdmin):
     )
     search_fields = ()
     ordering = ("-modified",)
+
+
+class UserTimeStampedModelAdmin(admin.ModelAdmin):
+    """
+    Base Django Admin
+    """
+
+    def save_model(self, request, obj, form, change):
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.modified_by = request.user
+        super().save_model(request, obj, form, change)
