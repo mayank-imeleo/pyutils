@@ -1,13 +1,12 @@
-from datetime import timedelta
 from typing import Type
 
+import pendulum
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
 from rest_framework.filters import SearchFilter
 from rest_framework.routers import SimpleRouter
 from rest_framework.viewsets import GenericViewSet
 
-from pyutils.datetime import ddmonyyyy_to_datetime
 from pyutils.django.models import BaseModel
 from pyutils.string import pascal_case_to_dash_case
 
@@ -83,11 +82,10 @@ class TimeStampedListModelMixin(mixins.ListModelMixin):
 
     def _parse_date_fields(self, request, *args, **kwargs):
         def parse(field):
-            # convert str to datetime
             if field in request.query_params:
-                dt = ddmonyyyy_to_datetime(request.query_params[field])
+                dt = pendulum.parse(request.query_params[field])
                 if field.endswith("__lte"):
-                    dt = dt + timedelta(days=1)
+                    dt = dt.add(days=1)  # add 1 day to include the end date
                 request.query_params[field] = dt
 
         parse("created__date")
