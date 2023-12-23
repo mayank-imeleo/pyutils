@@ -170,8 +170,6 @@ class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
     modified = AutoLastModifiedField(
         _("modified"), db_index=True, db_column="modified_at"
     )
-    created_at = created
-    modified_at = modified
 
     def _save_time_stamps(self, *args, **kwargs):
         update_fields = kwargs.get("update_fields", None)
@@ -195,6 +193,14 @@ class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
         return dt.astimezone(pytz.timezone(settings.LOCAL_TIME_ZONE)).strftime(
             "%d %b %Y %I:%M %p"
         )
+
+    @property
+    def created_at(self):
+        return self.created
+
+    @property
+    def modified_at(self):
+        return self.modified
 
     class Meta:
         abstract = True
