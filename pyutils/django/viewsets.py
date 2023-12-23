@@ -2,7 +2,7 @@ from typing import Type
 
 import pendulum
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins
+from rest_framework import mixins, permissions
 from rest_framework.filters import SearchFilter
 from rest_framework.routers import SimpleRouter
 from rest_framework.viewsets import GenericViewSet
@@ -22,6 +22,7 @@ class GenericModelViewSet(GenericViewSet):
     """
 
     filter_backends = [DjangoFilterBackend, SearchFilter]
+    permission_classes = (permissions.IsAuthenticated,)
 
     @classmethod
     def model(cls) -> BaseModel:

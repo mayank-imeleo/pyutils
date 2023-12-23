@@ -108,3 +108,5 @@ class NameIdModelSerializer(NameModelSerializer, IdModelSerializer):
 class LocalTimeStampModelSerializer(BaseModelSerializer):
     created = LocalTimeStampField()
     modified = LocalTimeStampField()
+    created_at = created
+    updated_at = modified
