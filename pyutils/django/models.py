@@ -202,6 +202,14 @@ class TimeStampedModel(mu_models.TimeStampedModel, BaseModel):
     def modified_at(self):
         return self.modified
 
+    @property
+    def created_date(self):
+        return self.created.date()
+
+    @property
+    def modified_date(self):
+        return self.modified.date()
+
     class Meta:
         abstract = True
 

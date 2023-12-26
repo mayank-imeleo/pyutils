@@ -89,9 +89,9 @@ class TimeStampedListModelMixin(mixins.ListModelMixin):
                     dt = dt.add(days=1)  # add 1 day to include the end date
                 request.query_params[field] = dt
 
-        parse("created__date")
-        parse("created__lte")
-        parse("created__gte")
+        parse("created_date_date")
+        parse("created_date_lte")
+        parse("created_date_gte")
 
 
 BaseModelViewSet = GenericModelViewSet
