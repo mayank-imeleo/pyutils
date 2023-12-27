@@ -1,6 +1,7 @@
 from typing import Type
 
 import pendulum
+from deprecated import deprecated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, permissions
 from rest_framework.filters import SearchFilter
@@ -114,6 +115,9 @@ class GenericRetrieveModelViewSet(mixins.RetrieveModelMixin, GenericModelViewSet
         return pascal_case_to_dash_case(s) + "-details"
 
 
+@deprecated(
+    "GenericCRUDModelViewSet is deprecated. Add specific mixins instead."
+)  # noqa
 class GenericCRUDModelViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
