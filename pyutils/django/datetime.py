@@ -20,5 +20,9 @@ def local_time_str(dt=now()):
     return datetime_to_time_str(dt, tz=settings.LOCAL_TIME_ZONE)
 
 
-def local_datetime_str(dt=now()):
+def local_datetime_str(dt=None):
+    dt = dt or now()
     return datetime_to_datetime_str(dt, tz=settings.LOCAL_TIME_ZONE)
+
+
+now_local = local_datetime_str
