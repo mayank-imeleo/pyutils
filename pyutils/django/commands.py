@@ -29,15 +29,15 @@ class ModelActionCommand(BaseCommand):
         """
         object_id = options.get("id", None)
         action = options.get("action")
+
         if not self.model_class:
             raise Exception("Model class not specified")
         if not action:
             raise Exception("Action not specified")
 
+        objs = self.model_class.objects.all().order_by("id")
         if object_id:
-            objs = self.model_class.objects.order_by("id").filter(id=object_id)
-        else:
-            objs = self.model_class.objects.all()
+            objs = objs.filter(id=object_id)
 
         start_time = pendulum.now()
         self.run_action(action, objs)
