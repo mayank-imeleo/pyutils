@@ -1,7 +1,7 @@
 import pytz
 from django.conf import settings
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializer
 from rest_framework.settings import api_settings
 
 from pyutils.django.models import BaseModel
@@ -27,6 +27,10 @@ class BaseModelSerializer(ModelSerializer):
     @property
     def model(self) -> type[BaseModel]:
         return getattr(self, "Meta").model
+
+
+class BaseHyperlinkedModelSerializer(HyperlinkedModelSerializer):
+    pass
 
 
 class IdModelSerializer(BaseModelSerializer):
