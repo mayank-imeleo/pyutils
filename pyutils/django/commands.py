@@ -20,6 +20,11 @@ class ModelActionCommand(BaseCommand):
             type=int,
             help="Instance ID to execute action command on",
         )
+        parser.add_argument(
+            "--desc",
+            action="store_true",
+            help="Execute action command on instances in descending order",
+        )
         parser.add_argument("--action", type=str, help="Execute command on instance")
         return parser
 
@@ -28,6 +33,7 @@ class ModelActionCommand(BaseCommand):
         Load Django settings.
         """
         object_id = options.get("id", None)
+        descending = options.get("desc", False)
         action = options.get("action")
 
         if not self.model_class:
@@ -36,6 +42,8 @@ class ModelActionCommand(BaseCommand):
             raise Exception("Action not specified")
 
         objs = self.model_class.objects.all().order_by("id")
+        if descending:
+            objs = objs.order_by("-id")
         if object_id:
             objs = objs.filter(id=object_id)
 
