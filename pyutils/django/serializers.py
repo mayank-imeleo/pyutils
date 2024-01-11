@@ -113,4 +113,4 @@ class LocalTimeStampModelSerializer(BaseModelSerializer):
     created = LocalTimeStampField()
     modified = LocalTimeStampField()
     created_at = created
-    updated_at = modified
+    modified_at = modified
