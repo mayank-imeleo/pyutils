@@ -152,6 +152,22 @@ class UserStampedModel(models.Model):
         related_name="%(app_label)s_%(class)s_modifiedby_relationship",
     )
 
+    @property
+    def created_by_name(self):
+        return self.created_by.name
+
+    @property
+    def created_by_id(self):
+        return self.created_by.id
+
+    @property
+    def modified_by_name(self):
+        return self.modified_by.name
+
+    @property
+    def modified_by_id(self):
+        return self.modified_by.id
+
     def _save_user_stamps(self, *args, **kwargs):
         # self.modified_by = self.get_
         update_fields = kwargs.get("update_fields", None)
