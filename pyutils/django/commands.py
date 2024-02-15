@@ -5,6 +5,18 @@ from django.core.management import BaseCommand
 from django.db.models import Model, QuerySet
 
 
+class ActionCommand(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument("--action", type=str, help="Action to perform")
+        return parser
+
+    def handle(self, *args, **options):
+        action = options.get("action")
+        if not action:
+            raise Exception("Action not specified")
+        getattr(self, action)()
+
+
 class ModelActionCommand(BaseCommand):
     """
     Base class for commands that need to load Django settings.
