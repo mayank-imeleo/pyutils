@@ -156,11 +156,14 @@ class ViewSetActionSerializerMixin:
         """
         response = super().create(request, *args, **kwargs)
         assert "id" in response.data, "id not found in response"
-        retreive_serializer_class = self.action_serializer_classes["retrieve"]
+        retrieve_serializer_class = self.action_serializer_classes["retrieve"]
         model_class = self.model()
         instance = model_class.objects.get(id=response.data["id"])
-        retreive_data = retreive_serializer_class(instance).data
-        response.data = retreive_data
+        retrieve_serializer = retrieve_serializer_class(
+            instance, context={"request": request}
+        )
+        retrieve_data = retrieve_serializer.data
+        response.data = retrieve_data
         return response
 
     def get_serializer_class(self):
