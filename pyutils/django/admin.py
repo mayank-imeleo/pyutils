@@ -14,7 +14,12 @@ class BaseDjangoAdmin(admin.ModelAdmin):
     ordering = ("id",)
 
 
-class TimeStampedModelAdmin(admin.ModelAdmin):
+class BaseModelAdmin(admin.ModelAdmin):
+    class Media:
+        js = ["admin/js/jquery.init.js", "pyutils/js/django/listFilters.js"]
+
+
+class TimeStampedModelAdmin(BaseModelAdmin):
     """
     Base Django Admin
     """
@@ -27,7 +32,7 @@ class TimeStampedModelAdmin(admin.ModelAdmin):
     ordering = ("-modified",)
 
 
-class UserTimeStampedModelAdmin(admin.ModelAdmin):
+class UserTimeStampedModelAdmin(BaseModelAdmin):
     """
     Base Django Admin
     """
