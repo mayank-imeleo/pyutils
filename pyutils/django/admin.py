@@ -32,6 +32,9 @@ class TimeStampedModelAdmin(BaseModelAdmin):
     ordering = ("-modified",)
 
 
+TimeStampedAdmin = TimeStampedModelAdmin
+
+
 class UserTimeStampedModelAdmin(BaseModelAdmin):
     """
     Base Django Admin
@@ -44,3 +47,17 @@ class UserTimeStampedModelAdmin(BaseModelAdmin):
             obj.created_by = request.user
         obj.modified_by = request.user
         super().save_model(request, obj, form, change)
+
+
+UserTimeStampedAdmin = UserTimeStampedModelAdmin
+
+
+class ReadOnlyAdmin(BaseModelAdmin):
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
