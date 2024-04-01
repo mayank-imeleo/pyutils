@@ -237,8 +237,12 @@ class NameAddressTimeStampedModel(NameModel, TimeStampedModel):
     add_line_2 = models.CharField(
         "Address Line 2", max_length=200, default="", blank=True, null=True
     )
+
     phone_num = models.CharField(
         "Phone Number", max_length=20, default="", blank=True, null=True
+    )
+    phone_number = models.CharField(
+        _("Phone Number"), max_length=20, default="", blank=True, null=True
     )
 
     email_address = models.EmailField(
