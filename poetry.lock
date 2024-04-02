@@ -345,17 +345,21 @@ testing = ["django-modelcluster"]
 
 [[package]]
 name = "django-smart-selects"
-version = "1.6.0"
+version = "1.7.1"
 description = "Django application to handle chained model fields."
 optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "django-smart-selects-1.6.0.tar.gz", hash = "sha256:67ce449bf456ddb6fc5434fa1a55f21194ef11a3b6871d7454f7f7c5a30bf493"},
-    {file = "django_smart_selects-1.6.0-py3-none-any.whl", hash = "sha256:bd8320a9d0f0a5e1d264f5563a3a068d4499e51481ee68a7712fe53272d572b0"},
-]
+python-versions = ">=3.8"
+files = []
+develop = false
 
 [package.dependencies]
-django = ">=2.2"
+django = ">=3.2"
+
+[package.source]
+type = "git"
+url = "https://github.com/jazzband/django-smart-selects"
+reference = "HEAD"
+resolved_reference = "1f3ac7c08a31d2e8cc792f1de484a027a25eef1f"
 
 [[package]]
 name = "django-taggit"
@@ -1400,4 +1404,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "da011620bd36a4f6a750e16cec0dff34bf41dec16ce585834ea71d53e0fd7997"
+content-hash = "32a6c3f0e2bbaa473f37fcf370a37b8cf2a330fdb62ad2465be47966d3c925a0"
