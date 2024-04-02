@@ -63,8 +63,12 @@ class AbstractEmailUser(NameAddressTimeStampedModel, AbstractUser):
 
     first_name = CharField(_("First Name"), blank=True, max_length=255)
     last_name = CharField(_("Last Name"), blank=True, max_length=255)
-    objects = UserManager()
     email = EmailField(_("email address"), unique=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    username = None
+    objects = UserManager()
 
     def __str__(self):
         return "{} {} ({})".format(self.first_name, self.last_name, self.email)
