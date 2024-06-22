@@ -1,8 +1,12 @@
 import pendulum
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
+from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework import mixins
+from wagtail.api.v2.filters import SearchFilter
 
 from pyutils.django.viewsets import GenericModelViewSet
+from pyutils.rest_framework.serializers import UserSerializer
 
 User = get_user_model()
 
